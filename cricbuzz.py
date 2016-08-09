@@ -59,7 +59,27 @@ class CricbuzzParser():
                 mstatus = state.getAttribute("status")
                 if mstatus.startswith("Starts") or mstatus.startswith("Coming"):
                     return None       #Match hasn't started Yet.
-        return {"Match Format":"TEST","Match":match_desc,"Venue":mground,"State":match_cstate,"Status":mstatus} 
+            try:
+                batting_team = match.getElementsByTagName("btTm")
+                bowling_team = match.getElementsByTagName("blgTm")
+                batting_team_name = batting_team[0].getAttribute("sName")
+                bowling_team_name = bowling_team[0].getAttribute("sName")
+                innings = match.getElementsByTagName("Inngs")
+                bat_runs = innings[0].getAttribute("r")
+                bat_overs = innings[0].getAttribute("ovrs")
+                bat_wkts = innings[0].getAttribute("wkts")
+            except Exception:
+                # Match is comple. Only Result is availabe now and btTm tag has been changed to Tm
+                # So, now only status of the match is important. Initialize none to other parameters.
+                batting_team = None
+                bowling_team = None
+                batting_team_name = None
+                bowling_team_name = None
+                innings = None
+                bat_runs = None
+                bat_overs = None
+                bat_wkts = None
+        return {"Match Format":"TEST","Match":match_desc,"Venue":mground,"State":match_cstate,"Status":mstatus, "Batting team":batting_team_name, "Bowling team":bowling_team_name, "Batting Team Runs":bat_runs, "Batting Team Overs":bat_overs, "Batting Team Wickets":bat_wkts}
                 
             
     def handleMatch(self,match):
